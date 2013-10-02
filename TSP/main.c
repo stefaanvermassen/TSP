@@ -27,6 +27,7 @@ int main(int argc, char *argv[])
         printf("Greedy approach:\n");
         init_greedy_route(&greedy_min, &distances);
         greedy_search(&greedy_min, &distances);
+        printf("%i\n", greedy_min.distance);
         for (i=0; i<=distances.number_of_cities; i++){
             printf("%i ", greedy_min.route_points[i]);
         }

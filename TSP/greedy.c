@@ -8,14 +8,14 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
+#include <limits.h>
 #include "greedy.h"
 
 void greedy_search(greedy_route *route, matrix *weights)
 {
     int *visited = (int *) calloc(weights->number_of_cities+1, sizeof(int));
     int number_of_visited = 1;
-    int smallest_distance = 9999;
+    int smallest_distance = INT_MAX;
     int i, city, nearest_ciy = 0;
    // printf("%i\n", visited[5]);
     while (number_of_visited <= weights->number_of_cities)
@@ -31,16 +31,19 @@ void greedy_search(greedy_route *route, matrix *weights)
             }
         }
         route->route_points[number_of_visited-1] = city;
+        if (number_of_visited != weights->number_of_cities) route->distance += smallest_distance;
         visited[city] = 1;
         city = nearest_ciy;
-        smallest_distance = 9999;
+        smallest_distance = INT_MAX;
         number_of_visited++;
         
     }
-    route->route_points[number_of_visited-1] = 0;
+    route->route_points[number_of_visited-1] = route->route_points[0];
+    route->distance += weights->data[route->route_points[number_of_visited-2]][route->route_points[number_of_visited-1]];
 }
 
 void init_greedy_route(greedy_route *route, matrix *weights)
 {
+    route->distance = 0;
     route->route_points = (int *) calloc(weights->number_of_cities, sizeof(int));
 }
