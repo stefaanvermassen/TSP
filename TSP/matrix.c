@@ -23,7 +23,7 @@ int read_distances(matrix *m, char **argv)
     }
     if (fscanf(f, "%d", &m->number_of_cities) == 1) {
         /*Make matrix*/
-        m->data = (int **)malloc(m->number_of_cities*sizeof(int));
+        m->data = (int **)malloc(m->number_of_cities*sizeof(int*));
         for(i=0; i<m->number_of_cities; i++){
             m->data[i] = (int *)malloc(m->number_of_cities*sizeof(int));
         }

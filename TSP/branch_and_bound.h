@@ -8,19 +8,22 @@
 
 #ifndef TSP_branch_and_bound_h
 #define TSP_branch_and_bound_h
+#include <math.h>
 #include "matrix.h"
 
 typedef struct {
     int distance;
+    int *route_points;
 } route;
 
 typedef struct {
-    int number_of_visited;
-    int visited[];
-} city;
+    int *visited;
+    int *route_points;
+} travel;
 
-
-void search(int city, int weight, int number_of_visited, int visited[], route *min, matrix *weights);
+void init_travel(route *min, travel *current, matrix *weights);
+void destroy_travel(route *min, travel *current);
+void search(int city, int weight, travel *current, int visited, route *min, matrix *weights);
 
 
 #endif

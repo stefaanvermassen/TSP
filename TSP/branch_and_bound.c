@@ -7,25 +7,48 @@
 //
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "branch_and_bound.h"
 
-void search(int city, int weight, int number_of_visited, int visited[], route *min, matrix *weights)
+void search(int city, int weight, travel *current, int visited, route *min, matrix *weights)
 {
-    int i;
-    if(number_of_visited == weights->number_of_cities)
+    int i,j;
+    //printf("visited: %i, city: %i, weight: %i\n", visited, city, weight);
+    current->route_points[visited-1] = city;
+    if(visited == weights->number_of_cities)
     {
         if(weight+weights->data[city][0] < min->distance)
         {
             min->distance = weight+weights->data[city][0];
+            for(j=0; j<=weights->number_of_cities; j++){
+                min->route_points[j] = current->route_points[j];
+            }
+            //memcpy(&min->route_points, &current->route_points, sizeof(current->route_points));
         }
     }else
     {
-        visited[city] = 1;
-        for(i=1; i<=weights->number_of_cities; i++){
-            if(visited[i] == 0){
-                search(i, weight+weights->data[city][i],number_of_visited+1, visited, min, weights);
+        current->visited[city] = 1;
+        current->route_points[visited-1] = city;
+        for(i=1; i<weights->number_of_cities; i++){
+            if(current->visited[i] == 0){
+                search(i, weight+weights->data[city][i],current, visited+1, min, weights);
             }
         }
-        visited[city]=0;
+        current->visited[city]=0;
     }
+}
+
+void init_travel(route *min, travel *current, matrix *weights)
+{
+    min->distance = INFINITY;
+    min->route_points = (int*) calloc(weights->number_of_cities, sizeof(int));
+    current->visited = (int*) calloc(weights->number_of_cities-1, sizeof(int));
+    current->route_points = (int*) calloc(weights->number_of_cities, sizeof(int));
+}
+
+void destroy_travel(route *min, travel *current){
+    free(current->route_points);
+    free(min->route_points);
+    free(current->visited);
 }

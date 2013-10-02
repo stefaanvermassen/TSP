@@ -14,13 +14,19 @@ int main(int argc, char *argv[])
     
     if(read_distances(&distances, argv) == 0){
         route min;
-        min.distance = 999;
-        int visited[distances.number_of_cities];
-        memset(visited, 0, distances.number_of_cities*sizeof(int));
-        search(0, 0, 1, visited, &min, &distances);
-        printf("Beste rondreis heeft lengte %i\n", min.distance);
+        travel current;
+        int i;
+        init_travel(&min, &current, &distances);
+        search(0, 0, &current, 1, &min, &distances);
+        printf("%i\n", min.distance);
+        for (i=0; i<=distances.number_of_cities; i++){
+            printf("%i ", min.route_points[i]);
+        }
+        printf("\n");
         /*Clean up*/
         destroy_matrix(&distances);
+        destroy_travel(&min, &current);
+        
     } else
     {
         return 1;
