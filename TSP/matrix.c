@@ -44,7 +44,6 @@ int read_distances(matrix *m, char **argv)
             
         }
         fclose(f);
-        printf("Smallest distance is%i\n", m->smallest_distance);
 //        for (i=0; i<m->number_of_cities; i++){
 //            for(j=0; j<m->number_of_cities; j++){
 //                printf("data[%i][%i]=%d\n", i,j,m->data[i][j]);
