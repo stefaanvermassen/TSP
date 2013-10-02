@@ -31,6 +31,7 @@ int main(int argc, char *argv[])
         for (i=0; i<=distances.number_of_cities; i++){
             printf("%i ", greedy_min.route_points[i]);
         }
+        printf("\n");
         /*Clean up*/
         destroy_matrix(&distances);
         destroy_travel(&min, &current);

@@ -40,7 +40,7 @@ void search(int city, int weight, travel *current, int visited, route *min, matr
 
 void init_travel(route *min, travel *current, matrix *weights)
 {
-    min->distance = INFINITY;
+    min->distance = INT_MAX;
     min->route_points = (int*) calloc(weights->number_of_cities+1, sizeof(int));
     current->visited = (int*) calloc(weights->number_of_cities, sizeof(int));
     current->route_points = (int*) calloc(weights->number_of_cities+1, sizeof(int));
