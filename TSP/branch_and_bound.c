@@ -24,14 +24,13 @@ void search(int city, int weight, travel *current, int visited, route *min, matr
             for(j=0; j<=weights->number_of_cities; j++){
                 min->route_points[j] = current->route_points[j];
             }
-            //memcpy(&min->route_points, &current->route_points, sizeof(current->route_points));
         }
     }else
     {
         current->visited[city] = 1;
         current->route_points[visited-1] = city;
         for(i=1; i<weights->number_of_cities; i++){
-            if(current->visited[i] == 0){
+            if((current->visited[i] == 0) && weight+weights->data[city][i] + (weights->number_of_cities - visited)*weights->smallest_distance < min->distance){
                 search(i, weight+weights->data[city][i],current, visited+1, min, weights);
             }
         }

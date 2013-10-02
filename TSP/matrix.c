@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include "matrix.h"
 
 int read_distances(matrix *m, char **argv)
@@ -15,6 +16,7 @@ int read_distances(matrix *m, char **argv)
     int c;
     FILE *f = NULL;
     m->number_of_cities = 0;
+    m->smallest_distance = INFINITY;
     int i,j=0;
     f = fopen(argv[1],"r");
     if(!f){
@@ -34,15 +36,20 @@ int read_distances(matrix *m, char **argv)
                 j++;
             }
             m->data[i][j] = c;
+            //save smallest distance
+            if(c<m->smallest_distance && i != j){
+                m->smallest_distance = c;
+            }
             i++;
             
         }
         fclose(f);
-        for (i=0; i<m->number_of_cities; i++){
-            for(j=0; j<m->number_of_cities; j++){
-                printf("data[%i][%i]=%d\n", i,j,m->data[i][j]);
-            }
-        }
+        printf("Smallest distance is%i\n", m->smallest_distance);
+//        for (i=0; i<m->number_of_cities; i++){
+//            for(j=0; j<m->number_of_cities; j++){
+//                printf("data[%i][%i]=%d\n", i,j,m->data[i][j]);
+//            }
+//        }
         
     }
     return 0;
