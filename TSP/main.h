@@ -8,7 +8,9 @@
 
 #ifndef TSP_main_h
 #define TSP_main_h
-
+#include "matrix.h"
+#include "branch_and_bound.h"
+#include "math.h"
 
 
 #endif

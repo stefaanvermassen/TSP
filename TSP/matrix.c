@@ -12,9 +12,10 @@
 
 int read_distances(matrix *m, char **argv)
 {
-    int i, j, c;
+    int c;
     FILE *f = NULL;
     m->number_of_cities = 0;
+    int i,j=0;
     f = fopen(argv[1],"r");
     if(!f){
         perror ("Failed to read inputfile");
@@ -26,9 +27,7 @@ int read_distances(matrix *m, char **argv)
         for(i=0; i<m->number_of_cities; i++){
             m->data[i] = (int *)malloc(m->number_of_cities*sizeof(int));
         }
-        
         i=0;
-        j=0;
         while(fscanf(f, "%d", &c) == 1){
             if(i==m->number_of_cities){
                 i=0;

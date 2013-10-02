@@ -16,4 +16,5 @@ typedef struct {
 
 int read_distances(matrix *m, char **argv);
 void destroy_matrix(matrix *m);
+
 #endif
