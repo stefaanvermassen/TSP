@@ -46,7 +46,7 @@ void greedy_search(greedy_route *route, matrix *weights)
 void init_greedy_route(greedy_route *route, matrix *weights)
 {
     route->distance = 0;
-    route->route_points = (int *) calloc(weights->number_of_cities, sizeof(int));
+    route->route_points = (int *) calloc(weights->number_of_cities+1, sizeof(int));
 }
 
 void destroy_greedy_route(greedy_route *route){
