@@ -8,37 +8,29 @@ int main(int argc, char *argv[])
 {
     matrix distances;
     if (argc != 2){
-        fprintf(stderr, "Wrong arguments!");
+        fprintf(stderr, "Wrong arguments!\n");
         return 1;
     }
     
     if(read_distances(&distances, argv) == 0){
-        route min;
-        greedy_route greedy_min;
-        travel current;
-        int i;
-        init_travel(&min, &current, &distances);
-        search(0, 0, &current, 1, &min, &distances);
-        printf("%i\n", min.distance);
-        for (i=0; i<=distances.number_of_cities; i++){
-            printf("%i ", min.route_points[i]);
-        }
-        printf("\n");
-        printf("Greedy approach:\n");
-        init_greedy_route(&greedy_min, &distances);
-        greedy_search(&greedy_min, &distances);
-        printf("%i\n", greedy_min.distance);
-        for (i=0; i<=distances.number_of_cities; i++){
-            printf("%i ", greedy_min.route_points[i]);
-        }
-        printf("\n");
+        int p_id, p_total;
+        MPI_Init (&argc, &argv);
+        MPI_Comm_rank (MPI_COMM_WORLD, &p_id);
+        MPI_Comm_size(MPI_COMM_WORLD, &p_total);
         /*Clean up*/
+        perform_branch_and_bound(&distances, p_id, p_total);
         destroy_matrix(&distances);
-        destroy_travel(&min, &current);
+        MPI_Finalize();
     } else
     {
         return 1;
     }
     
     return (EXIT_SUCCESS);
+}
+
+void perform_branch_and_bound(matrix* distances, int p_id, int p_total)
+{
+    best_solution best;
+    search_solution(distances, &best, p_id, p_total);
 }

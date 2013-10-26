@@ -23,7 +23,7 @@ void greedy_search(greedy_route *route, matrix *weights)
         for(i=0; i<weights->number_of_cities; i++)
         {
             if (city != i && weights->data[city][i] < smallest_distance){
-                if(visited[i]==0)
+                if(!visited[i])
                 {
                     nearest_ciy = i;
                     smallest_distance = weights->data[city][i];

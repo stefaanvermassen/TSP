@@ -8,9 +8,12 @@
 
 #ifndef TSP_main_h
 #define TSP_main_h
+#include <mpi.h>
 #include "matrix.h"
 #include "branch_and_bound.h"
 #include "greedy.h"
+#include "solution.h"
 
+void perform_branch_and_bound(matrix* distances, int p_id, int p_total);
 
 #endif
