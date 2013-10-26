@@ -19,6 +19,7 @@ int main(int argc, char *argv[])
         MPI_Comm_size(MPI_COMM_WORLD, &p_total);
         /*Clean up*/
         perform_branch_and_bound(&distances, p_id, p_total);
+        //perform_greedy(&distances, p_id);
         destroy_matrix(&distances);
         MPI_Finalize();
     } else
@@ -33,4 +34,9 @@ void perform_branch_and_bound(matrix* distances, int p_id, int p_total)
 {
     best_solution best;
     search_solution(distances, &best, p_id, p_total);
+}
+
+void perform_greedy(matrix* distances, int p_id)
+{
+    search_greedy_solution(distances, p_id);
 }

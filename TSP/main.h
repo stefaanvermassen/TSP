@@ -15,5 +15,6 @@
 #include "solution.h"
 
 void perform_branch_and_bound(matrix* distances, int p_id, int p_total);
+void perform_greedy(matrix* distances, int p_id);
 
 #endif

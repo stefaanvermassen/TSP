@@ -16,7 +16,8 @@ void greedy_search(greedy_route *route, matrix *weights)
     int *visited = (int *) calloc(weights->number_of_cities+1, sizeof(int));
     int number_of_visited = 1;
     int smallest_distance = INT_MAX;
-    int i, city, nearest_ciy = 0;
+    int i,nearest_ciy = 0;
+    int city=route->start_city;
    // printf("%i\n", visited[5]);
     while (number_of_visited <= weights->number_of_cities)
     {
@@ -41,6 +42,22 @@ void greedy_search(greedy_route *route, matrix *weights)
     route->route_points[number_of_visited-1] = route->route_points[0];
     route->distance += weights->data[route->route_points[number_of_visited-2]][route->route_points[number_of_visited-1]];
     free(visited);
+}
+
+void search_greedy_solution(matrix* weights, int p_id)
+{
+    int i;
+    greedy_route greedy_min;
+    init_greedy_route(&greedy_min, weights);
+    greedy_min.start_city=3;
+    greedy_search(&greedy_min, weights);
+    printf("%i\n", greedy_min.distance);
+    for(i=0; i<weights->number_of_cities; i++)
+    {
+        printf("%i", greedy_min.route_points[i]);
+    }
+    printf("\n");
+    destroy_greedy_route(&greedy_min);
 }
 
 void init_greedy_route(greedy_route *route, matrix *weights)

@@ -12,9 +12,11 @@
 
 typedef struct {
     int distance;
+    int start_city;
     int *route_points;
 } greedy_route;
 
+void search_greedy_solution(matrix* weights, int p_id);
 void greedy_search(greedy_route *route, matrix *weights);
 void init_greedy_route(greedy_route *route, matrix *weights);
 void destroy_greedy_route(greedy_route *route);
