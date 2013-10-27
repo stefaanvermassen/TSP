@@ -20,6 +20,7 @@ int main(int argc, char *argv[])
         /*Clean up*/
         perform_branch_and_bound(&distances, p_id, p_total);
         //perform_greedy(&distances, p_id);
+        
         destroy_matrix(&distances);
         MPI_Finalize();
     } else

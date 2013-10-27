@@ -14,7 +14,16 @@
 
 void search(int city, int weight, travel *current, int visited, route *min, matrix *weights, best_solution* best, int* b_nr, int p_id)
 {
-    int i,j;
+    int i,j,z;
+    MPI_Status status;
+    MPI_Request request;
+    int * mpi_rec_value = (int*) malloc(sizeof(int));
+    *mpi_rec_value=INT_MAX;
+    int * mpi_test_value = (int*) malloc(sizeof(int));
+    *mpi_test_value=0;
+    MPI_Irecv(mpi_rec_value, 1, MPI_INT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &request);
+    MPI_Test(&request, mpi_test_value, &status);
+    
     current->route_points[visited-1] = city;
     if(visited == weights->number_of_cities)
     {
@@ -23,6 +32,14 @@ void search(int city, int weight, travel *current, int visited, route *min, matr
             min->distance = weight+weights->data[city][0];
             for(j=0; j<=weights->number_of_cities; j++){
                 min->route_points[j] = current->route_points[j];
+            }
+            if(min->distance<=*mpi_rec_value)
+            {
+                for(z=0; z<best->number_of_processes; z++)
+                {
+                    //printf("isend:%i\n", min->distance);
+                    MPI_Isend(&min->distance, 1, MPI_INT, z, 0, MPI_COMM_WORLD, &request);
+                }
             }
         }
     }else
@@ -35,7 +52,20 @@ void search(int city, int weight, travel *current, int visited, route *min, matr
                 if(!current->visited[i]){
                     if(!on_splitlevel(best, visited) || p_id == (*b_nr%best->number_of_processes))
                     {
-                       search(i, weight+weights->data[city][i],current, visited+1, min, weights, best, b_nr,p_id);
+                        if(*mpi_test_value)
+                        {
+                            if(weight+weights->data[city][i]+(weights->number_of_cities - visited)*weights->smallest_distance<=*mpi_rec_value)
+                            {
+                                search(i, weight+weights->data[city][i],current, visited+1, min, weights, best, b_nr,p_id);
+                            }else
+                            {
+                                //printf("bound %i,%i!\n", weight+weights->data[city][i], *mpi_rec_value);
+                            }
+                        } else
+                        {
+                            //printf("Not received\n");
+                            search(i, weight+weights->data[city][i],current, visited+1, min, weights, best, b_nr,p_id);
+                        }
                     }
                     if(on_splitlevel(best, visited))
                     {
@@ -47,6 +77,8 @@ void search(int city, int weight, travel *current, int visited, route *min, matr
         }
         current->visited[city]=0;
     }
+    //free(mpi_rec_value);
+    //free(mpi_test_value);
 }
 
 void init_travel(route *min, travel *current, matrix *weights)
@@ -71,7 +103,8 @@ void search_solution(matrix* distances, best_solution* best, int p_id, int p_tot
     init_travel(&min, &current, distances);
     int b_nr=0;
     best->number_of_processes = p_total;
-    best->splitlevel=2;
+    best->splitlevel=1;
+    best->distance = INT_MAX;
     search(0, 0, &current, 1, &min, distances, best, &b_nr, p_id);
     printf("p_id:%i, distance:%i\n", p_id, min.distance);
     for(i=0; i<distances->number_of_cities; i++)
