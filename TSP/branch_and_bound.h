@@ -9,7 +9,7 @@
 #ifndef TSP_branch_and_bound_h
 #define TSP_branch_and_bound_h
 #include <limits.h>
-#include "matrix.h"
+#include "main.h"
 #include "solution.h"
 
 typedef struct {

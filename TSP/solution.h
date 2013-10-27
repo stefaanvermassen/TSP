@@ -8,12 +8,17 @@
 
 #ifndef TSP_solution_h
 #define TSP_solution_h
+//#include "main.h"
+#include "matrix.h"
 
 typedef struct{
     int distance;
     int splitlevel;
     int number_of_processes;
+    int *route_points;
 } best_solution;
 
+void init_solution(best_solution* best, matrix* distances, int number_of_processes, int splitlevel);
+void destroy_solution(best_solution* best, matrix* distances);
 
 #endif

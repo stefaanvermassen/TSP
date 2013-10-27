@@ -13,8 +13,10 @@
 #include "branch_and_bound.h"
 #include "greedy.h"
 #include "solution.h"
-
-void perform_branch_and_bound(matrix* distances, int p_id, int p_total);
+#define TAG_BOUND 0
+#define TAG_DISTANCE 1
+#define TAG_ROUTE 2
+void perform_branch_and_bound(matrix* distances, best_solution* best, int p_id, int p_total);
 void perform_greedy(matrix* distances, int p_id);
 
 #endif
