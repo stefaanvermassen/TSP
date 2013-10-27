@@ -100,7 +100,7 @@ void destroy_travel(route *min, travel *current){
 
 void search_solution(matrix* distances, best_solution* best, int p_id, int p_total)
 {
-    int i,j,received_size;
+    int i,received_size,smallest_dist, index_smallest_distance;
     route min;
     travel current;
     MPI_Status status_send_dist;
@@ -111,12 +111,12 @@ void search_solution(matrix* distances, best_solution* best, int p_id, int p_tot
     init_travel(&min, &current, distances);
     int b_nr=0;
     search(0, 0, &current, 1, &min, distances, best, &b_nr, p_id);
-    printf("p_id:%i, distance:%i\n", p_id, min.distance);
+    /*printf("p_id:%i, distance:%i\n", p_id, min.distance);
     for(i=0; i<distances->number_of_cities; i++)
     {
         printf("%i",min.route_points[i]);
     }
-    printf("\n");
+    printf("\n");*/
     best->distance = min.distance;
     for(i=0;i<distances->number_of_cities; i++)
     {
@@ -131,7 +131,6 @@ void search_solution(matrix* distances, best_solution* best, int p_id, int p_tot
         MPI_Wait(&request_ids, &status_send_ids);
     } else
     {
-        printf("test\n");
         MPI_Status status_dist;
         MPI_Status status_ids;
         int results_dist[p_total];
@@ -150,20 +149,27 @@ void search_solution(matrix* distances, best_solution* best, int p_id, int p_tot
             } else {
                 printf("ERROR: received route size %i but expected %i (from process %i).\n", received_size, distances->number_of_cities, status_ids.MPI_SOURCE);
             }
-
-            
         }
-        printf("%i\n", results_dist[5]);
-        for(i=0; i<best->number_of_processes; i++)
+        smallest_dist=results_dist[0];
+        for(i=1; i<best->number_of_processes; i++)
         {
-            printf("Process %i found distance %i.\n The route is \n ", i, results_dist[i]);
-            for(j=0; j<distances->number_of_cities; j++)
+            if(results_dist[i]<smallest_dist)
             {
-                printf("%i", results_ids[i][j]);
+                index_smallest_distance = i;
+                smallest_dist = results_dist[i];
             }
-            printf("\n");
-            
         }
+        best->distance=smallest_dist;
+        for(i=0; i<distances->number_of_cities; i++)
+        {
+            best->route_points[i]=results_ids[index_smallest_distance][i];
+        }
+        printf("%i\n",best->distance);
+        for(i=0; i<=distances->number_of_cities; i++)
+        {
+            printf("%i",best->route_points[i]);
+        }
+        printf("\n");
     }
     destroy_travel(&min, &current);
     
