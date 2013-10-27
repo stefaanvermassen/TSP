@@ -100,7 +100,7 @@ void destroy_travel(route *min, travel *current){
 
 void search_solution(matrix* distances, best_solution* best, int p_id, int p_total)
 {
-    int i,received_size,smallest_dist, index_smallest_distance;
+    int i,smallest_dist, index_smallest_distance;
     route min;
     travel current;
     MPI_Status status_distance;
@@ -110,6 +110,7 @@ void search_solution(matrix* distances, best_solution* best, int p_id, int p_tot
     int** all_routes;
     init_travel(&min, &current, distances);
     int b_nr=0;
+    int* received_size =  (int*)malloc(sizeof(int));
     search(0, 0, &current, 1, &min, distances, best, &b_nr, p_id);
     /*printf("p_id:%i, distance:%i\n", p_id, min.distance);
     for(i=0; i<distances->number_of_cities; i++)
@@ -142,12 +143,12 @@ void search_solution(matrix* distances, best_solution* best, int p_id, int p_tot
             MPI_Probe(MPI_ANY_SOURCE, TAG_DISTANCE, MPI_COMM_WORLD, &status_dist);
             MPI_Recv(&all_distances[status_dist.MPI_SOURCE], 1, MPI_INT, MPI_ANY_SOURCE, TAG_DISTANCE, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
             MPI_Probe(MPI_ANY_SOURCE, TAG_ROUTE, MPI_COMM_WORLD, &status_ids);
-            MPI_Get_count(&status_ids, MPI_INT, &received_size);
-            if (received_size == distances->number_of_cities) {
+            MPI_Get_count(&status_ids, MPI_INT, received_size);
+            if (*received_size == distances->number_of_cities) {
                 all_routes[status_ids.MPI_SOURCE] = (int*) malloc(distances->number_of_cities * sizeof (int));
                 MPI_Recv(all_routes[status_ids.MPI_SOURCE], distances->number_of_cities, MPI_INT, MPI_ANY_SOURCE, TAG_ROUTE, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
             } else {
-                printf("ERROR: received route size %i but expected %i (from process %i).\n", received_size, distances->number_of_cities, status_ids.MPI_SOURCE);
+                printf("ERROR: received route size %i but expected %i (from process %i).\n", *received_size, distances->number_of_cities, status_ids.MPI_SOURCE);
             }
         }
         smallest_dist=all_distances[0];
@@ -171,6 +172,7 @@ void search_solution(matrix* distances, best_solution* best, int p_id, int p_tot
         }
         printf("\n");
     }
+    free(received_size);
     destroy_travel(&min, &current);
     
 }
