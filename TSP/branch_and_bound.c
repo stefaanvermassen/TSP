@@ -103,11 +103,11 @@ void search_solution(matrix* distances, best_solution* best, int p_id, int p_tot
     int i,received_size,smallest_dist, index_smallest_distance;
     route min;
     travel current;
-    MPI_Status status_send_dist;
-    MPI_Status status_send_ids;
-    MPI_Request request_dist;
-    MPI_Request request_ids;
-    int** results_ids;
+    MPI_Status status_distance;
+    MPI_Status status_route;
+    MPI_Request request_distance;
+    MPI_Request request_route;
+    int** all_routes;
     init_travel(&min, &current, distances);
     int b_nr=0;
     search(0, 0, &current, 1, &min, distances, best, &b_nr, p_id);
@@ -125,44 +125,44 @@ void search_solution(matrix* distances, best_solution* best, int p_id, int p_tot
     if(p_id != 0)
     {
         //send solution to process 0
-        MPI_Isend(&(best->distance), 1, MPI_INT, 0, TAG_DISTANCE, MPI_COMM_WORLD, &request_dist);
-        MPI_Isend((best->route_points), distances->number_of_cities, MPI_INT, 0, TAG_ROUTE, MPI_COMM_WORLD, &request_ids);
-        MPI_Wait(&request_dist, &status_send_dist);
-        MPI_Wait(&request_ids, &status_send_ids);
+        MPI_Isend(&(best->distance), 1, MPI_INT, 0, TAG_DISTANCE, MPI_COMM_WORLD, &request_distance);
+        MPI_Isend((best->route_points), distances->number_of_cities, MPI_INT, 0, TAG_ROUTE, MPI_COMM_WORLD, &request_route);
+        MPI_Wait(&request_distance, &status_distance);
+        MPI_Wait(&request_route, &status_route);
     } else
     {
         MPI_Status status_dist;
         MPI_Status status_ids;
-        int results_dist[p_total];
-        results_ids = (int**) malloc(p_total * sizeof (int*));
-        results_dist[0] = min.distance;
-        results_ids[0] = min.route_points;
+        int all_distances[p_total];
+        all_routes = (int**) malloc(p_total * sizeof (int*));
+        all_distances[0] = min.distance;
+        all_routes[0] = min.route_points;
         for(i=0; i<p_total-1; i++)
         {
             MPI_Probe(MPI_ANY_SOURCE, TAG_DISTANCE, MPI_COMM_WORLD, &status_dist);
-            MPI_Recv(&results_dist[status_dist.MPI_SOURCE], 1, MPI_INT, MPI_ANY_SOURCE, TAG_DISTANCE, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            MPI_Recv(&all_distances[status_dist.MPI_SOURCE], 1, MPI_INT, MPI_ANY_SOURCE, TAG_DISTANCE, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
             MPI_Probe(MPI_ANY_SOURCE, TAG_ROUTE, MPI_COMM_WORLD, &status_ids);
             MPI_Get_count(&status_ids, MPI_INT, &received_size);
             if (received_size == distances->number_of_cities) {
-                results_ids[status_ids.MPI_SOURCE] = (int*) malloc(distances->number_of_cities * sizeof (int));
-                MPI_Recv(results_ids[status_ids.MPI_SOURCE], distances->number_of_cities, MPI_INT, MPI_ANY_SOURCE, TAG_ROUTE, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+                all_routes[status_ids.MPI_SOURCE] = (int*) malloc(distances->number_of_cities * sizeof (int));
+                MPI_Recv(all_routes[status_ids.MPI_SOURCE], distances->number_of_cities, MPI_INT, MPI_ANY_SOURCE, TAG_ROUTE, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
             } else {
                 printf("ERROR: received route size %i but expected %i (from process %i).\n", received_size, distances->number_of_cities, status_ids.MPI_SOURCE);
             }
         }
-        smallest_dist=results_dist[0];
+        smallest_dist=all_distances[0];
         for(i=1; i<best->number_of_processes; i++)
         {
-            if(results_dist[i]<smallest_dist)
+            if(all_distances[i]<smallest_dist)
             {
                 index_smallest_distance = i;
-                smallest_dist = results_dist[i];
+                smallest_dist = all_distances[i];
             }
         }
         best->distance=smallest_dist;
         for(i=0; i<distances->number_of_cities; i++)
         {
-            best->route_points[i]=results_ids[index_smallest_distance][i];
+            best->route_points[i]=all_routes[index_smallest_distance][i];
         }
         printf("%i\n",best->distance);
         for(i=0; i<=distances->number_of_cities; i++)
