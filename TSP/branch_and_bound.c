@@ -186,7 +186,3 @@ int on_splitlevel(best_solution* t, int visited)
     //printf("%i,%i\n", visited, t->splitlevel);
     return visited == t->splitlevel;
 }
-int distance_from_splitlevel(best_solution* t, int visited)
-{
-    return t->splitlevel - visited;
-}

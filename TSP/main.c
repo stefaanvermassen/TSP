@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
         MPI_Comm_rank (MPI_COMM_WORLD, &p_id);
         MPI_Comm_size(MPI_COMM_WORLD, &p_total);
         /*Clean up*/
-        init_solution(&best, &distances, p_total, 2);
+        init_solution(&best, &distances, p_total, 3);
         perform_branch_and_bound(&distances, &best, p_id, p_total);
         //perform_greedy(&distances, p_id);
         destroy_solution(&best, &distances);
