@@ -10,6 +10,7 @@ int main(int argc, char *argv[])
     int i, j, p_id, p_total;
     best_solution best;
     matrix distances;
+    matrix * dist = NULL;
     if (argc != 2){
         fprintf(stderr, "Wrong arguments!\n");
         return 1;
@@ -23,7 +24,6 @@ int main(int argc, char *argv[])
         read_distances(&distances, argv);
         for(i=1; i<p_total; i++)
         {
-            //number_of_cities = distances.number_of_cities;
             MPI_Send(&(distances.number_of_cities), 1, MPI_INT, i, TAG_SIZE, MPI_COMM_WORLD);
             for(j=0; j<distances.number_of_cities; j++)
             {
@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
     } else
     {
         MPI_Recv(&number_of_cities, 1, MPI_INT, 0, TAG_SIZE, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-        matrix * dist = (matrix*) malloc (sizeof(matrix));
+        dist = (matrix*) malloc (sizeof(matrix));
         dist->data = (int **)malloc(number_of_cities*sizeof(int*));
         for(i=0; i<number_of_cities; i++){
             dist->data[i] = (int *)malloc(number_of_cities*sizeof(int));
@@ -53,23 +53,38 @@ int main(int argc, char *argv[])
         distances.smallest_distance = dist->smallest_distance;
     }
     
-    
-    /*Clean up*/
+    /*init_solution(&best, &distances, p_total-1, 2);
+    if(p_id != p_total-1)
+    {
+        perform_branch_and_bound(&distances, &best, p_id);
+    }else
+    {
+        perform_greedy(&distances, &best, p_id);
+    }*/
     init_solution(&best, &distances, p_total, 2);
-    perform_branch_and_bound(&distances, &best, p_id, p_total);
-    //perform_greedy(&distances, p_id);
+    perform_branch_and_bound(&distances, &best, p_id);
+    //perform_greedy(&distances, &best, p_id);
     destroy_solution(&best, &distances);
     destroy_matrix(&distances);
+    destroy_distance_matrice(dist, p_id);
     MPI_Finalize();
     return (EXIT_SUCCESS);
 }
 
-void perform_branch_and_bound(matrix* distances, best_solution* best, int p_id, int p_total)
+void perform_branch_and_bound(matrix* distances, best_solution* best, int p_id)
 {
-    search_solution(distances, best, p_id, p_total);
+    search_solution(distances, best, p_id);
 }
 
-void perform_greedy(matrix* distances, int p_id)
+void perform_greedy(matrix* distances, best_solution* best, int p_id)
 {
-    search_greedy_solution(distances, p_id);
+    search_greedy_solution(distances, best, p_id);
+}
+
+void destroy_distance_matrice(matrix* distances, int p_id)
+{
+    if(p_id != 0)
+    {
+        free(distances);
+    }
 }

@@ -9,6 +9,8 @@
 #ifndef TSP_greedy_h
 #define TSP_greedy_h
 #include "matrix.h"
+#include "solution.h"
+#include "main.h"
 
 typedef struct {
     int distance;
@@ -16,8 +18,8 @@ typedef struct {
     int *route_points;
 } greedy_route;
 
-void search_greedy_solution(matrix* weights, int p_id);
-void greedy_search(greedy_route *route, matrix *weights);
+void search_greedy_solution(matrix* weights, best_solution* best, int p_id);
+void greedy_search(greedy_route *route, matrix *weights, best_solution* best);
 void init_greedy_route(greedy_route *route, matrix *weights);
 void destroy_greedy_route(greedy_route *route);
 #endif

@@ -24,12 +24,14 @@ void search(int city, int weight, travel *current, int visited, route *min, matr
     int i,j,z;
     MPI_Status status;
     MPI_Request request;
-    //int * mpi_rec_value = (int*) malloc(sizeof(int));
     mpi_rec_value=INT_MAX;
-    //int * mpi_test_value = (int*) malloc(sizeof(int));
     mpi_test_value=0;
     MPI_Irecv(&mpi_rec_value, 1, MPI_INT, MPI_ANY_SOURCE, TAG_BOUND, MPI_COMM_WORLD, &request);
     MPI_Test(&request, &mpi_test_value, &status);
+    
+    if(mpi_rec_value<best->distance){
+        best->distance = mpi_rec_value;
+    }
     
     current->route_points[visited-1] = city;
     if(visited == weights->number_of_cities)
@@ -44,7 +46,6 @@ void search(int city, int weight, travel *current, int visited, route *min, matr
             {
                 for(z=0; z<best->number_of_processes; z++)
                 {
-                    //printf("isend:%i\n", min->distance);
                     MPI_Isend(&min->distance, 1, MPI_INT, z, TAG_BOUND, MPI_COMM_WORLD, &request);
                 }
             }
@@ -70,6 +71,7 @@ void search(int city, int weight, travel *current, int visited, route *min, matr
                             }
                         } else
                         {
+                            
                             search(i, weight+weights->data[city][i],current, visited+1, min, weights, best, b_nr,p_id);
                         }
                     }
@@ -101,7 +103,7 @@ void destroy_travel(route *min, travel *current){
     free(current->visited);
 }
 
-void search_solution(matrix* distances, best_solution* best, int p_id, int p_total)
+void search_solution(matrix* distances, best_solution* best, int p_id)
 {
     int i,smallest_dist, index_smallest_distance;
     route min;
@@ -113,14 +115,15 @@ void search_solution(matrix* distances, best_solution* best, int p_id, int p_tot
     int** all_routes;
     init_travel(&min, &current, distances);
     int b_nr=0;
-    int* received_size =  (int*)malloc(sizeof(int));
+    int* received_size = (int*)malloc(sizeof(int));
+    best->distance=INT_MAX;
     search(0, 0, &current, 1, &min, distances, best, &b_nr, p_id);
-    /*printf("p_id:%i, distance:%i\n", p_id, min.distance);
+    printf("p_id:%i, distance:%i\n", p_id, min.distance);
     for(i=0; i<distances->number_of_cities; i++)
     {
         printf("%i",min.route_points[i]);
     }
-    printf("\n");*/
+    printf("\n");
     best->distance = min.distance;
     for(i=0;i<distances->number_of_cities; i++)
     {
@@ -137,11 +140,11 @@ void search_solution(matrix* distances, best_solution* best, int p_id, int p_tot
     {
         MPI_Status status_dist;
         MPI_Status status_ids;
-        int all_distances[p_total];
-        all_routes = (int**) malloc(p_total * sizeof (int*));
+        int all_distances[best->number_of_processes];
+        all_routes = (int**) malloc(best->number_of_processes * sizeof (int*));
         all_distances[0] = min.distance;
         all_routes[0] = min.route_points;
-        for(i=0; i<p_total-1; i++)
+        for(i=0; i<best->number_of_processes-1; i++)
         {
             MPI_Probe(MPI_ANY_SOURCE, TAG_DISTANCE, MPI_COMM_WORLD, &status_dist);
             MPI_Recv(&all_distances[status_dist.MPI_SOURCE], 1, MPI_INT, MPI_ANY_SOURCE, TAG_DISTANCE, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
@@ -174,10 +177,14 @@ void search_solution(matrix* distances, best_solution* best, int p_id, int p_tot
             printf("%i",best->route_points[i]);
         }
         printf("\n");
+        for(i=1; i<best->number_of_processes; i++)
+        {
+            free(all_routes[i]);
+        }
+        free(&all_routes[0]);
     }
     free(received_size);
     destroy_travel(&min, &current);
-    
 }
 
 int above_splitlevel(best_solution* t, int visited)

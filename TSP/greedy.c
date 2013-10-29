@@ -9,10 +9,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <mpi.h>
 #include "greedy.h"
 
-void greedy_search(greedy_route *route, matrix *weights)
+void greedy_search(greedy_route *route, matrix *weights, best_solution* best)
 {
+    MPI_Request request;
     int *visited = (int *) calloc(weights->number_of_cities+1, sizeof(int));
     int number_of_visited = 1;
     int smallest_distance = INT_MAX;
@@ -41,16 +43,20 @@ void greedy_search(greedy_route *route, matrix *weights)
     }
     route->route_points[number_of_visited-1] = route->route_points[0];
     route->distance += weights->data[route->route_points[number_of_visited-2]][route->route_points[number_of_visited-1]];
+    for(i=0; i<best->number_of_processes; i++)
+    {
+        MPI_Isend(&route->distance, 1, MPI_INT, i, TAG_BOUND, MPI_COMM_WORLD, &request);
+    }
     free(visited);
 }
 
-void search_greedy_solution(matrix* weights, int p_id)
+void search_greedy_solution(matrix* weights, best_solution* best, int p_id)
 {
     int i;
     greedy_route greedy_min;
     init_greedy_route(&greedy_min, weights);
     greedy_min.start_city=3;
-    greedy_search(&greedy_min, weights);
+    greedy_search(&greedy_min, weights, best);
     printf("%i\n", greedy_min.distance);
     for(i=0; i<weights->number_of_cities; i++)
     {
