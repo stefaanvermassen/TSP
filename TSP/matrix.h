@@ -16,6 +16,7 @@ typedef struct {
 } matrix;
 
 int read_distances(matrix *m, char **argv);
+void fill_distance_matrix(matrix* m, int number_of_cities);
 void destroy_matrix(matrix *m);
 
 #endif

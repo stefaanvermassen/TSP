@@ -4,32 +4,63 @@
 #include <string.h>
 #include "main.h"
 
+int number_of_cities, smallest_distance;
 int main(int argc, char *argv[])
 {
+    int i, j, p_id, p_total;
+    best_solution best;
     matrix distances;
     if (argc != 2){
         fprintf(stderr, "Wrong arguments!\n");
         return 1;
     }
-    
-    if(read_distances(&distances, argv) == 0){
-        int p_id, p_total;
-        best_solution best;
-        MPI_Init (&argc, &argv);
-        MPI_Comm_rank (MPI_COMM_WORLD, &p_id);
-        MPI_Comm_size(MPI_COMM_WORLD, &p_total);
-        /*Clean up*/
-        init_solution(&best, &distances, p_total, 3);
-        perform_branch_and_bound(&distances, &best, p_id, p_total);
-        //perform_greedy(&distances, p_id);
-        destroy_solution(&best, &distances);
-        destroy_matrix(&distances);
-        MPI_Finalize();
+    MPI_Init (&argc, &argv);
+    MPI_Comm_rank (MPI_COMM_WORLD, &p_id);
+    MPI_Comm_size(MPI_COMM_WORLD, &p_total);
+    //Root process has to read the input data...
+    if(p_id == 0)
+    {
+        read_distances(&distances, argv);
+        for(i=1; i<p_total; i++)
+        {
+            //number_of_cities = distances.number_of_cities;
+            MPI_Send(&(distances.number_of_cities), 1, MPI_INT, i, TAG_SIZE, MPI_COMM_WORLD);
+            for(j=0; j<distances.number_of_cities; j++)
+            {
+                MPI_Send(distances.data[j], distances.number_of_cities, MPI_INT, i, TAG_DATA, MPI_COMM_WORLD);
+            }
+            
+            MPI_Send(&distances.smallest_distance, 1, MPI_INT, i, TAG_SMALLEST, MPI_COMM_WORLD);
+        }
+        
     } else
     {
-        return 1;
+        MPI_Recv(&number_of_cities, 1, MPI_INT, 0, TAG_SIZE, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        matrix * dist = (matrix*) malloc (sizeof(matrix));
+        dist->data = (int **)malloc(number_of_cities*sizeof(int*));
+        for(i=0; i<number_of_cities; i++){
+            dist->data[i] = (int *)malloc(number_of_cities*sizeof(int));
+        }
+        dist->number_of_cities =number_of_cities;
+        for(i=0; i<dist->number_of_cities; i++)
+        {
+            MPI_Recv(dist->data[i], number_of_cities, MPI_INT, 0, TAG_DATA, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        }
+        MPI_Recv(&smallest_distance, 1, MPI_INT, 0, TAG_SMALLEST, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        dist->smallest_distance = smallest_distance;
+        distances.number_of_cities = dist->number_of_cities;
+        distances.data = dist->data;
+        distances.smallest_distance = dist->smallest_distance;
     }
     
+    
+    /*Clean up*/
+    init_solution(&best, &distances, p_total, 2);
+    perform_branch_and_bound(&distances, &best, p_id, p_total);
+    //perform_greedy(&distances, p_id);
+    destroy_solution(&best, &distances);
+    destroy_matrix(&distances);
+    MPI_Finalize();
     return (EXIT_SUCCESS);
 }
 

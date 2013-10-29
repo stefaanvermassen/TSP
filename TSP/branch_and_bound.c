@@ -16,17 +16,20 @@
 __typeof__ (b) _b = (b); \
 _a > _b ? _b : _a; })
 
+int mpi_rec_value;
+int mpi_test_value;
+
 void search(int city, int weight, travel *current, int visited, route *min, matrix *weights, best_solution* best, int* b_nr, int p_id)
 {
     int i,j,z;
     MPI_Status status;
     MPI_Request request;
-    int * mpi_rec_value = (int*) malloc(sizeof(int));
-    *mpi_rec_value=INT_MAX;
-    int * mpi_test_value = (int*) malloc(sizeof(int));
-    *mpi_test_value=0;
-    MPI_Irecv(mpi_rec_value, 1, MPI_INT, MPI_ANY_SOURCE, TAG_BOUND, MPI_COMM_WORLD, &request);
-    MPI_Test(&request, mpi_test_value, &status);
+    //int * mpi_rec_value = (int*) malloc(sizeof(int));
+    mpi_rec_value=INT_MAX;
+    //int * mpi_test_value = (int*) malloc(sizeof(int));
+    mpi_test_value=0;
+    MPI_Irecv(&mpi_rec_value, 1, MPI_INT, MPI_ANY_SOURCE, TAG_BOUND, MPI_COMM_WORLD, &request);
+    MPI_Test(&request, &mpi_test_value, &status);
     
     current->route_points[visited-1] = city;
     if(visited == weights->number_of_cities)
@@ -37,7 +40,7 @@ void search(int city, int weight, travel *current, int visited, route *min, matr
             for(j=0; j<=weights->number_of_cities; j++){
                 min->route_points[j] = current->route_points[j];
             }
-            if(min->distance<=*mpi_rec_value)
+            if(min->distance<=mpi_rec_value)
             {
                 for(z=0; z<best->number_of_processes; z++)
                 {
@@ -56,9 +59,9 @@ void search(int city, int weight, travel *current, int visited, route *min, matr
                 if(!current->visited[i]){
                     if(!on_splitlevel(best, visited) || p_id == (*b_nr%best->number_of_processes))
                     {
-                        if(*mpi_test_value)
+                        if(mpi_test_value)
                         {
-                            if(weight+weights->data[city][i]+(weights->number_of_cities - visited)*weights->smallest_distance<=min(*mpi_rec_value,min->distance))
+                            if(weight+weights->data[city][i]+(weights->number_of_cities - visited)*weights->smallest_distance<=min(mpi_rec_value,min->distance))
                             {
                                 search(i, weight+weights->data[city][i],current, visited+1, min, weights, best, b_nr,p_id);
                             }else
@@ -148,7 +151,7 @@ void search_solution(matrix* distances, best_solution* best, int p_id, int p_tot
                 all_routes[status_ids.MPI_SOURCE] = (int*) malloc(distances->number_of_cities * sizeof (int));
                 MPI_Recv(all_routes[status_ids.MPI_SOURCE], distances->number_of_cities, MPI_INT, MPI_ANY_SOURCE, TAG_ROUTE, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
             } else {
-                printf("ERROR: received route size %i but expected %i (from process %i).\n", *received_size, distances->number_of_cities, status_ids.MPI_SOURCE);
+                printf("Received a route of the wrong size!\n");
             }
         }
         smallest_dist=all_distances[0];
