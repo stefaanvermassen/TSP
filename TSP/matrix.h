@@ -13,10 +13,13 @@ typedef struct {
     int number_of_cities;
     int ** data;
     int smallest_distance;
+    int * min_door;
 } matrix;
 
 int read_distances(matrix *m, char **argv);
-void fill_distance_matrix(matrix* m, int number_of_cities);
-void destroy_matrix(matrix *m);
+void init_min_door(matrix *m);
+size_t quickfindPartition (char * base, size_t left, size_t right, size_t size, size_t pivotIndex);
+void quickfindFirstK (char * base, size_t left, size_t right, size_t size, size_t k);
+void destroy_matrix(matrix *m, int p_id);
 
 #endif

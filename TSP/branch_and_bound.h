@@ -26,6 +26,7 @@ void init_travel(route *min, travel *current, matrix *weights);
 void destroy_travel(route *min, travel *current);
 void search_solution(matrix* distances, best_solution* best, int p_id);
 void search(int city, int weight, travel *current, int visited, route *min, matrix *weights, best_solution* best, int* b_nr, int p_id);
+int get_min_door_bound(travel *current, matrix *weights);
 int above_splitlevel(best_solution* t, int visited);
 int on_splitlevel(best_solution* t, int visited);
 

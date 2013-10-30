@@ -19,8 +19,8 @@
 #define TAG_DATA 3
 #define TAG_SIZE 4
 #define TAG_SMALLEST 5
+#define TAG_MIN_DOOR 6
 void perform_branch_and_bound(matrix* distances, best_solution* best, int p_id);
 void perform_greedy(matrix* distances, best_solution* best, int p_id);
 void destroy_distance_matrice(matrix* distances, int p_id);
-
 #endif

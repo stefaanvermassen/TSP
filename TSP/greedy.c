@@ -48,22 +48,25 @@ void greedy_search(greedy_route *route, matrix *weights, best_solution* best)
     free(visited);
 }
 
-int search_greedy_solution(matrix* weights, best_solution* best, int p_id, int start_city)
+void search_greedy_solution(matrix* weights, best_solution* best, int p_id)
 {
-    int solution;
-    greedy_route greedy_min;
-    init_greedy_route(&greedy_min, weights);
-    greedy_min.start_city= start_city;
-    greedy_search(&greedy_min, weights, best);
-    //printf("%i\n", greedy_min.distance);
-    /*for(i=0; i<weights->number_of_cities; i++)
+    int i,j;
+    for(i=0; i<weights->number_of_cities; i++)
     {
-        printf("%i", greedy_min.route_points[i]);
+        greedy_route greedy_min;
+        init_greedy_route(&greedy_min, weights);
+        greedy_min.start_city= i;
+        greedy_search(&greedy_min, weights, best);
+        if(greedy_min.distance < best->greedy_distance)
+        {
+            best->greedy_distance = greedy_min.distance;
+            for(j=0; j<weights->number_of_cities; j++)
+            {
+                best->greedy_route[j]=greedy_min.route_points[j];
+            }
+        }
+        destroy_greedy_route(&greedy_min);
     }
-    printf("\n");*/
-    solution = greedy_min.distance;
-    destroy_greedy_route(&greedy_min);
-    return solution;
 }
 
 void init_greedy_route(greedy_route *route, matrix *weights)

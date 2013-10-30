@@ -13,9 +13,11 @@
 
 typedef struct{
     int distance;
+    int greedy_distance;
     int splitlevel;
     int number_of_processes;
     int *route_points;
+    int *greedy_route;
 } best_solution;
 
 void init_solution(best_solution* best, matrix* distances, int number_of_processes, int splitlevel);

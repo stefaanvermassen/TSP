@@ -54,7 +54,7 @@ void search(int city, int weight, travel *current, int visited, route *min, matr
     {
         current->visited[city] = 1;
         current->route_points[visited-1] = city;
-        if(above_splitlevel(best, visited) || weight + (weights->number_of_cities - visited)*weights->smallest_distance < min->distance)
+        if(above_splitlevel(best, visited) || weight + get_min_door_bound(current, weights) < min(best->distance, min->distance))
         {
             for(i=1; i<weights->number_of_cities; i++){
                 if(!current->visited[i]){
@@ -63,7 +63,7 @@ void search(int city, int weight, travel *current, int visited, route *min, matr
                         if(weight+weights->data[city][i]+(weights->number_of_cities - visited)*weights->smallest_distance<=min(best->distance,min->distance)){
                             search(i, weight+weights->data[city][i],current, visited+1, min, weights, best, b_nr,p_id);
                         } else {
-                            printf("2bound %i<=min(%i,%i)p_id=%i\n", weight+weights->data[city][i]+(weights->number_of_cities - visited)*weights->smallest_distance, best->distance, min->distance, p_id);
+                            //printf("2bound %i<=min(%i,%i)p_id=%i\n", weight+weights->data[city][i]+(weights->number_of_cities - visited)*weights->smallest_distance, best->distance, min->distance, p_id);
                         }
                         
                     }
@@ -77,8 +77,6 @@ void search(int city, int weight, travel *current, int visited, route *min, matr
         }
         current->visited[city]=0;
     }
-    //free(mpi_rec_value);
-    //free(mpi_test_value);
 }
 
 void init_travel(route *min, travel *current, matrix *weights)
@@ -110,12 +108,12 @@ void search_solution(matrix* distances, best_solution* best, int p_id)
     int* received_size = (int*)malloc(sizeof(int));
     best->distance=INT_MAX;
     search(0, 0, &current, 1, &min, distances, best, &b_nr, p_id);
-    printf("p_id:%i, distance:%i\n", p_id, min.distance);
+    /*printf("p_id:%i, distance:%i\n", p_id, min.distance);
     for(i=0; i<distances->number_of_cities; i++)
     {
         printf("%i",min.route_points[i]);
     }
-    printf("\n");
+    printf("\n");*/
     best->distance = min.distance;
     for(i=0;i<distances->number_of_cities; i++)
     {
@@ -188,4 +186,13 @@ int on_splitlevel(best_solution* t, int visited)
 {
     //printf("%i,%i\n", visited, t->splitlevel);
     return visited == t->splitlevel;
+}
+
+int get_min_door_bound(travel *current, matrix *weights){
+    int i, sum=0;
+    for(i=0; i<weights->number_of_cities; i++)
+    {
+        if(!current->visited[i]) sum = sum + weights->min_door[i];
+    }
+    return (sum+1)/2;
 }
