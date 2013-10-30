@@ -18,7 +18,7 @@ typedef struct {
     int *route_points;
 } greedy_route;
 
-void search_greedy_solution(matrix* weights, best_solution* best, int p_id);
+int search_greedy_solution(matrix* weights, best_solution* best, int p_id, int start_city);
 void greedy_search(greedy_route *route, matrix *weights, best_solution* best);
 void init_greedy_route(greedy_route *route, matrix *weights);
 void destroy_greedy_route(greedy_route *route);

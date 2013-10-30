@@ -29,7 +29,7 @@ void search(int city, int weight, travel *current, int visited, route *min, matr
     MPI_Irecv(&mpi_rec_value, 1, MPI_INT, MPI_ANY_SOURCE, TAG_BOUND, MPI_COMM_WORLD, &request);
     MPI_Test(&request, &mpi_test_value, &status);
     
-    if(mpi_rec_value<best->distance){
+    if(mpi_test_value && mpi_rec_value<best->distance){
         best->distance = mpi_rec_value;
     }
     
@@ -60,20 +60,12 @@ void search(int city, int weight, travel *current, int visited, route *min, matr
                 if(!current->visited[i]){
                     if(!on_splitlevel(best, visited) || p_id == (*b_nr%best->number_of_processes))
                     {
-                        if(mpi_test_value)
-                        {
-                            if(weight+weights->data[city][i]+(weights->number_of_cities - visited)*weights->smallest_distance<=min(mpi_rec_value,min->distance))
-                            {
-                                search(i, weight+weights->data[city][i],current, visited+1, min, weights, best, b_nr,p_id);
-                            }else
-                            {
-                                //printf("bound %i<=min(%i,%i)\n", weight+weights->data[city][i]+(weights->number_of_cities - visited)*weights->smallest_distance, *mpi_rec_value, min->distance);
-                            }
-                        } else
-                        {
-                            
+                        if(weight+weights->data[city][i]+(weights->number_of_cities - visited)*weights->smallest_distance<=min(best->distance,min->distance)){
                             search(i, weight+weights->data[city][i],current, visited+1, min, weights, best, b_nr,p_id);
+                        } else {
+                            printf("2bound %i<=min(%i,%i)p_id=%i\n", weight+weights->data[city][i]+(weights->number_of_cities - visited)*weights->smallest_distance, best->distance, min->distance, p_id);
                         }
+                        
                     }
                     if(on_splitlevel(best, visited))
                     {
@@ -171,6 +163,7 @@ void search_solution(matrix* distances, best_solution* best, int p_id)
         {
             best->route_points[i]=all_routes[index_smallest_distance][i];
         }
+        //printf("branch and bound is klaar\n");
         printf("%i\n",best->distance);
         for(i=0; i<=distances->number_of_cities; i++)
         {

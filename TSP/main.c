@@ -61,8 +61,16 @@ int main(int argc, char *argv[])
     {
         perform_greedy(&distances, &best, p_id);
     }*/
-    init_solution(&best, &distances, p_total, 2);
-    perform_branch_and_bound(&distances, &best, p_id);
+    init_solution(&best, &distances, p_total-1, 2);
+    //Use the last process for greedy heuristic
+    if(p_id != p_total-1)
+    {
+        perform_branch_and_bound(&distances, &best, p_id);
+    }else
+    {
+        perform_greedy(&distances, &best, p_id);
+    }
+    //perform_branch_and_bound(&distances, &best, p_id);
     //perform_greedy(&distances, &best, p_id);
     destroy_solution(&best, &distances);
     destroy_matrix(&distances);
@@ -78,7 +86,19 @@ void perform_branch_and_bound(matrix* distances, best_solution* best, int p_id)
 
 void perform_greedy(matrix* distances, best_solution* best, int p_id)
 {
-    search_greedy_solution(distances, best, p_id);
+    int i, sol;
+    MPI_Request request;
+    int best_greedy_solution = search_greedy_solution(distances, best, p_id, 0);
+    for(i=1; i<distances->number_of_cities; i++)
+    {
+        sol = search_greedy_solution(distances, best, p_id, i);
+        if(sol<best_greedy_solution) best_greedy_solution = sol;
+    }
+    if(sol<best->distance) best->distance = sol;
+    for(i=0; i<best->number_of_processes-1; i++)
+    {
+        MPI_Isend(&best_greedy_solution, 1, MPI_INT, i, TAG_BOUND, MPI_COMM_WORLD, &request);
+    }
 }
 
 void destroy_distance_matrice(matrix* distances, int p_id)
