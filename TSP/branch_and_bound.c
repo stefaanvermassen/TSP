@@ -32,6 +32,7 @@ void search(int city, int weight, travel *current, int visited, route *min, matr
     if(mpi_test_value && mpi_rec_value<best->distance){
         best->distance = mpi_rec_value;
     }
+    //printf("TEST%i\n", weights->current_min_door);
     
     current->route_points[visited-1] = city;
     if(visited == weights->number_of_cities)
@@ -53,8 +54,9 @@ void search(int city, int weight, travel *current, int visited, route *min, matr
     }else
     {
         current->visited[city] = 1;
+        weights->current_min_door -= weights->min_door[city];
         current->route_points[visited-1] = city;
-        if(above_splitlevel(best, visited) || weight + get_min_door_bound(current, weights) < min(best->distance, min->distance))
+        if(above_splitlevel(best, visited) || weight + ((weights->current_min_door+1)/2) < min(best->distance, min->distance))
         {
             for(i=1; i<weights->number_of_cities; i++){
                 if(!current->visited[i]){
@@ -76,6 +78,7 @@ void search(int city, int weight, travel *current, int visited, route *min, matr
             }
         }
         current->visited[city]=0;
+        weights->current_min_door += weights->min_door[city];
     }
 }
 
@@ -186,13 +189,4 @@ int on_splitlevel(best_solution* t, int visited)
 {
     //printf("%i,%i\n", visited, t->splitlevel);
     return visited == t->splitlevel;
-}
-
-int get_min_door_bound(travel *current, matrix *weights){
-    int i, sum=0;
-    for(i=0; i<weights->number_of_cities; i++)
-    {
-        if(!current->visited[i]) sum = sum + weights->min_door[i];
-    }
-    return (sum+1)/2;
 }

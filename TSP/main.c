@@ -4,7 +4,7 @@
 #include <string.h>
 #include "main.h"
 
-int number_of_cities, smallest_distance;
+int number_of_cities, smallest_distance, current_min_door;
 int main(int argc, char *argv[])
 {
     int i, j, p_id, p_total;
@@ -32,6 +32,7 @@ int main(int argc, char *argv[])
             
             MPI_Send(&distances.smallest_distance, 1, MPI_INT, i, TAG_SMALLEST, MPI_COMM_WORLD);
             MPI_Send(distances.min_door, distances.number_of_cities, MPI_INT, i, TAG_MIN_DOOR, MPI_COMM_WORLD);
+            MPI_Send(&(distances.current_min_door), 1, MPI_INT, i, TAG_CURRENT_MIN_DOOR, MPI_COMM_WORLD);
         }
         
     } else
@@ -50,11 +51,14 @@ int main(int argc, char *argv[])
         }
         MPI_Recv(&smallest_distance, 1, MPI_INT, 0, TAG_SMALLEST, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         MPI_Recv(dist->min_door, number_of_cities, MPI_INT, 0, TAG_MIN_DOOR, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        MPI_Recv(&current_min_door, 1, MPI_INT, 0, TAG_CURRENT_MIN_DOOR, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        dist->current_min_door=current_min_door;
         dist->smallest_distance = smallest_distance;
         distances.number_of_cities = dist->number_of_cities;
         distances.data = dist->data;
         distances.smallest_distance = dist->smallest_distance;
         distances.min_door = dist->min_door;
+        distances.current_min_door = dist->current_min_door;
     }
     
     init_solution(&best, &distances, p_total-1, 1);

@@ -104,6 +104,7 @@ void init_min_door(matrix *m)
 {
     int i,j;
     m->min_door = (int*) malloc(m->number_of_cities * sizeof(int));
+    m->current_min_door=0;
     for(i=0; i<m->number_of_cities; i++)
     {
         int minima[m->number_of_cities];
@@ -119,6 +120,7 @@ void init_min_door(matrix *m)
         }
         quickfindFirstK((void*) minima, 0, m->number_of_cities-1, sizeof(int), 2);
         m->min_door[i] = minima[0] + minima[1];
+        m->current_min_door += m->min_door[i];
     }
 }
 

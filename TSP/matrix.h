@@ -14,6 +14,7 @@ typedef struct {
     int ** data;
     int smallest_distance;
     int * min_door;
+    int current_min_door;
 } matrix;
 
 int read_distances(matrix *m, char **argv);
