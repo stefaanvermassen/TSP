@@ -27,7 +27,7 @@ int read_distances(matrix *m, char **argv)
     int c;
     FILE *f = NULL;
     m->number_of_cities = 0;
-    m->smallest_distance = INFINITY;
+    m->smallest_distance = INT_MAX;
     int i,j=0;
     f = fopen(argv[1],"r");
     if(!f){

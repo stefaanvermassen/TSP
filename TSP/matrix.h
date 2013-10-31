@@ -8,6 +8,7 @@
 
 #ifndef TSP_matrix_h
 #define TSP_matrix_h
+#include <stddef.h>
 
 typedef struct {
     int number_of_cities;
