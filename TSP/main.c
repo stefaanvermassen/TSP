@@ -94,6 +94,7 @@ void perform_greedy(matrix* distances, best_solution* best, int p_id)
     {
         MPI_Isend(&best->greedy_distance, 1, MPI_INT, i, TAG_BOUND, MPI_COMM_WORLD, &request);
     }
+    //printf("%i\n", best->greedy_distance);
     
 }
 
