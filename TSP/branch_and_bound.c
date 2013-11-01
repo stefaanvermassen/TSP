@@ -86,7 +86,7 @@ void check_for_better_bound(best_solution * best, int visited){
         MPI_Test(&request, &mpi_test_value, &status);
         if(mpi_test_value && mpi_rec_value<best->distance){
             best->distance = mpi_rec_value;
-            printf("received%i\n", mpi_rec_value);
+            //printf("received%i\n", mpi_rec_value);
         }
     }
 }
