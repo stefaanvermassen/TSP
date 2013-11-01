@@ -145,7 +145,7 @@ void search_solution(matrix* distances, best_solution* best, int p_id)
         all_routes[0] = min.route_points;
         for(i=0; i<best->number_of_processes-1; i++)
         {
-            MPI_Probe(MPI_ANY_SOURCE, TAG_DISTANCE, MPI_COMM_WORLD, &status_dist);
+           /* MPI_Probe(MPI_ANY_SOURCE, TAG_DISTANCE, MPI_COMM_WORLD, &status_dist);
             MPI_Recv(&all_distances[status_dist.MPI_SOURCE], 1, MPI_INT, MPI_ANY_SOURCE, TAG_DISTANCE, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
             MPI_Probe(MPI_ANY_SOURCE, TAG_ROUTE, MPI_COMM_WORLD, &status_ids);
             MPI_Get_count(&status_ids, MPI_INT, received_size);
@@ -154,7 +154,7 @@ void search_solution(matrix* distances, best_solution* best, int p_id)
                 MPI_Recv(all_routes[status_ids.MPI_SOURCE], distances->number_of_cities, MPI_INT, MPI_ANY_SOURCE, TAG_ROUTE, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
             } else {
                 printf("Received a route of the wrong size!\n");
-            }
+            }*/
         }
         smallest_dist=all_distances[0];
         for(i=1; i<best->number_of_processes; i++)
