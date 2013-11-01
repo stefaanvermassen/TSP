@@ -168,15 +168,15 @@ void search_solution(matrix* distances, best_solution* best, int p_id)
         best->distance=smallest_dist;
         for(i=0; i<distances->number_of_cities; i++)
         {
-            printf("test%i\n",all_routes[index_smallest_distance][i]);
+            best->route_points[i]=all_routes[index_smallest_distance][i];
         }
         //printf("branch and bound is klaar\n");
-        /*printf("%i\n",best->distance);
+        printf("%i\n",best->distance);
         for(i=0; i<=distances->number_of_cities; i++)
         {
             printf("%i",best->route_points[i]);
         }
-        printf("\n");*/
+        printf("\n");
         for(i=1; i<best->number_of_processes; i++)
         {
             free(all_routes[i]);
