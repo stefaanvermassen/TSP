@@ -104,7 +104,7 @@ void destroy_travel(route *min, travel *current){
 
 void search_solution(matrix* distances, best_solution* best, int p_id)
 {
-    int i,smallest_dist, index_smallest_distance;
+    int i,smallest_dist;
     route min;
     travel current;
     MPI_Status status_distance;
@@ -114,15 +114,16 @@ void search_solution(matrix* distances, best_solution* best, int p_id)
     int** all_routes;
     init_travel(&min, &current, distances);
     int b_nr=0;
+    int index_smallest_distance = 0;
     int* received_size = (int*)malloc(sizeof(int));
     best->distance=INT_MAX;
     search(0, 0, &current, 1, &min, distances, best, &b_nr, p_id);
-    printf("p_id:%i, distance:%i\n", p_id, min.distance);
+    /*printf("p_id:%i, distance:%i\n", p_id, min.distance);
     for(i=0; i<distances->number_of_cities; i++)
     {
         printf("%i",min.route_points[i]);
     }
-    printf("\n");
+    printf("\n");*/
     best->distance = min.distance;
     for(i=0;i<distances->number_of_cities; i++)
     {
@@ -170,7 +171,6 @@ void search_solution(matrix* distances, best_solution* best, int p_id)
         {
             best->route_points[i]=all_routes[index_smallest_distance][i];
         }
-        //printf("branch and bound is klaar\n");
         printf("%i\n",best->distance);
         for(i=0; i<=distances->number_of_cities; i++)
         {
