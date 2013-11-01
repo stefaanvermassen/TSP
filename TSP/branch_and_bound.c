@@ -176,7 +176,7 @@ void search_solution(matrix* distances, best_solution* best, int p_id)
             printf("%i\n",best->distance);
             for(i=0; i<=distances->number_of_cities; i++)
             {
-                printf("%i",best->route_points[i]);
+                printf("%i ",best->route_points[i]);
             }
             printf("\n");
             for(i=1; i<best->number_of_processes; i++)
@@ -191,7 +191,7 @@ void search_solution(matrix* distances, best_solution* best, int p_id)
         printf("%i\n",min.distance);
         for(i=0; i<=distances->number_of_cities; i++)
         {
-            printf("%i",min.route_points[i]);
+            printf("%i ",min.route_points[i]);
         }
         printf("\n");
     }

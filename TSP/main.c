@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
     {
         read_distances(&distances, argv);
         init_solution(&best, &distances, p_total, 1);
-        perform_branch_and_bound(&distances, &best, p_id);        
+        perform_branch_and_bound(&distances, &best, p_id);
     }
     destroy_solution(&best, &distances);
     destroy_matrix(&distances,p_id);
