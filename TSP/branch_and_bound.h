@@ -25,8 +25,8 @@ typedef struct {
 void init_travel(route *min, travel *current, matrix *weights);
 void destroy_travel(route *min, travel *current);
 void search_solution(matrix* distances, best_solution* best, int p_id);
-void search(int city, int weight, travel *current, int visited, route *min, matrix *weights, best_solution* best, int* b_nr, int p_id);
-void check_for_better_bound(best_solution * best, int visited);
+void search(int city, int weight, travel *current, int visited, route *min, matrix *weights, best_solution* best, int* b_nr, int p_id, MPI_Request bound_request);
+void check_for_better_bound(best_solution * best, int visited, MPI_Request bound_request);
 int above_splitlevel(best_solution* t, int visited);
 int on_splitlevel(best_solution* t, int visited);
 

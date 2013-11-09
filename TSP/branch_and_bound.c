@@ -19,11 +19,10 @@ _a > _b ? _b : _a; })
 int mpi_rec_value;
 int mpi_test_value;
 
-void search(int city, int weight, travel *current, int visited, route *min, matrix *weights, best_solution* best, int* b_nr, int p_id)
+void search(int city, int weight, travel *current, int visited, route *min, matrix *weights, best_solution* best, int* b_nr, int p_id, MPI_Request bound_request)
 {
     int i,j,z;
-    MPI_Request request;
-    check_for_better_bound(best, visited);
+    //check_for_better_bound(best, visited, bound_request);
     
     current->route_points[visited-1] = city;
     if(visited == weights->number_of_cities)
@@ -38,8 +37,9 @@ void search(int city, int weight, travel *current, int visited, route *min, matr
             {
                 for(z=0; z<best->number_of_processes; z++)
                 {
+                    MPI_Request send_request;
                     int dist = min(min->distance, best->distance);
-                    MPI_Isend(&dist, 1, MPI_INT, z, TAG_BOUND, MPI_COMM_WORLD, &request);
+                    MPI_Isend(&dist, 1, MPI_INT, z, TAG_BOUND, MPI_COMM_WORLD, &send_request);
                 }
             }
         }
@@ -48,15 +48,30 @@ void search(int city, int weight, travel *current, int visited, route *min, matr
         current->visited[city] = 1;
         weights->current_min_door -= weights->min_door[city];
         current->route_points[visited-1] = city;
+        check_for_better_bound(best, visited, bound_request);
+        if(mpi_test_value)
+        {
+            MPI_Request new_bound_request;
+            MPI_Irecv(&mpi_rec_value, 1, MPI_INT, MPI_ANY_SOURCE, TAG_BOUND, MPI_COMM_WORLD, &new_bound_request);
+            bound_request = new_bound_request;
+        }
         if(above_splitlevel(best, visited) || weight + ((weights->current_min_door+1)/2) < min(best->distance, min->distance))
         {
             for(i=1; i<weights->number_of_cities; i++){
                 if(!current->visited[i]){
                     if(!on_splitlevel(best, visited) || p_id == (*b_nr%best->number_of_processes))
                     {
-                        check_for_better_bound(best, visited);
+                        check_for_better_bound(best, visited, bound_request);
+                        if(mpi_test_value)
+                        {
+                            MPI_Request new_bound_request;
+                            MPI_Irecv(&mpi_rec_value, 1, MPI_INT, MPI_ANY_SOURCE, TAG_BOUND, MPI_COMM_WORLD, &new_bound_request);
+                            bound_request = new_bound_request;
+                        }
                         if(weight+weights->data[city][i]+(weights->number_of_cities - visited)*weights->smallest_distance<=min(best->distance,min->distance)){
-                            search(i, weight+weights->data[city][i],current, visited+1, min, weights, best, b_nr,p_id);
+                            
+                            search(i, weight+weights->data[city][i],current, visited+1, min, weights, best, b_nr,p_id, bound_request);
+                            
                         } else {
                             //printf("2bound %i<=min(%i,%i)p_id=%i\n", weight+weights->data[city][i]+(weights->number_of_cities - visited)*weights->smallest_distance, best->distance, min->distance, p_id);
                         }
@@ -75,15 +90,13 @@ void search(int city, int weight, travel *current, int visited, route *min, matr
     }
 }
 
-void check_for_better_bound(best_solution * best, int visited){
+void check_for_better_bound(best_solution * best, int visited, MPI_Request bound_request){
     mpi_rec_value=INT_MAX;
     mpi_test_value=0;
     if(!above_splitlevel(best, visited))
     {
         MPI_Status status;
-        MPI_Request request;
-        MPI_Irecv(&mpi_rec_value, 1, MPI_INT, MPI_ANY_SOURCE, TAG_BOUND, MPI_COMM_WORLD, &request);
-        MPI_Test(&request, &mpi_test_value, &status);
+        MPI_Test(&bound_request, &mpi_test_value, &status);
         if(mpi_test_value && mpi_rec_value<best->distance){
             best->distance = mpi_rec_value;
             //printf("received%i\n", mpi_rec_value);
@@ -112,21 +125,23 @@ void search_solution(matrix* distances, best_solution* best, int p_id)
     travel current;
     MPI_Status status_distance;
     MPI_Status status_route;
+    MPI_Request bound_request;
     MPI_Request request_distance;
     MPI_Request request_route;
     int** all_routes;
+    MPI_Irecv(&mpi_rec_value, 1, MPI_INT, MPI_ANY_SOURCE, TAG_BOUND, MPI_COMM_WORLD, &bound_request);
     init_travel(&min, &current, distances);
     int b_nr=0;
     int index_smallest_distance = 0;
     int* received_size = (int*)malloc(sizeof(int));
     best->distance=INT_MAX;
-    search(0, 0, &current, 1, &min, distances, best, &b_nr, p_id);
-    /*printf("p_id:%i, distance:%i\n", p_id, min.distance);
+    search(0, 0, &current, 1, &min, distances, best, &b_nr, p_id, bound_request);
+    printf("p_id:%i, distance:%i\n", p_id, min.distance);
      for(i=0; i<distances->number_of_cities; i++)
      {
      printf("%i",min.route_points[i]);
      }
-     printf("\n");*/
+     printf("\n");
     if(best->number_of_processes>1)
     {
         best->distance = min.distance;
