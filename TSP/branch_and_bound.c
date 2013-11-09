@@ -22,7 +22,6 @@ int mpi_test_value;
 void search(int city, int weight, travel *current, int visited, route *min, matrix *weights, best_solution* best, int* b_nr, int p_id, MPI_Request bound_request)
 {
     int i,j,z;
-    //check_for_better_bound(best, visited, bound_request);
     
     current->route_points[visited-1] = city;
     if(visited == weights->number_of_cities)
@@ -136,12 +135,12 @@ void search_solution(matrix* distances, best_solution* best, int p_id)
     int* received_size = (int*)malloc(sizeof(int));
     best->distance=INT_MAX;
     search(0, 0, &current, 1, &min, distances, best, &b_nr, p_id, bound_request);
-    printf("p_id:%i, distance:%i\n", p_id, min.distance);
+    /*printf("p_id:%i, distance:%i\n", p_id, min.distance);
      for(i=0; i<distances->number_of_cities; i++)
      {
      printf("%i",min.route_points[i]);
      }
-     printf("\n");
+     printf("\n");*/
     if(best->number_of_processes>1)
     {
         best->distance = min.distance;
