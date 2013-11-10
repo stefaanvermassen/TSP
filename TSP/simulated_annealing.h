@@ -9,6 +9,7 @@
 #ifndef TSP_simulated_annealing_h
 #define TSP_simulated_annealing_h
 #include "solution.h"
+#include "main.h"
 
 void simulated_annealing_search(best_solution* best, matrix* weights);
 int get_swap_distance(int dst, int i, int j, int* path, matrix* weights);

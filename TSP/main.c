@@ -70,8 +70,6 @@ int main(int argc, char *argv[])
             perform_branch_and_bound(&distances, &best, p_id);
         }else
         {
-            //Use greedy algorithm as a base for the simulated annealing algorithm
-            //best->greedy_route is the best route found by greedy algorithm
             perform_greedy(&distances, &best, p_id);
         }
         destroy_distance_matrice(dist, p_id);
@@ -80,8 +78,7 @@ int main(int argc, char *argv[])
     {
         read_distances(&distances, argv);
         init_solution(&best, &distances, p_total, 1);
-        //perform_branch_and_bound(&distances, &best, p_id);
-        perform_greedy(&distances, &best, p_id);
+        perform_branch_and_bound(&distances, &best, p_id);
     }
     destroy_solution(&best, &distances);
     destroy_matrix(&distances,p_id);
@@ -96,24 +93,10 @@ void perform_branch_and_bound(matrix* distances, best_solution* best, int p_id)
 
 void perform_greedy(matrix* distances, best_solution* best, int p_id)
 {
-    int i;
-    MPI_Request request;
+    //Use greedy algorithm as a base for the simulated annealing algorithm
+    //best->greedy_route is the best route found by greedy algorithm
     search_greedy_solution(distances, best, p_id);
-    printf("%i\n", best->greedy_distance);
-    for(i=0; i<distances->number_of_cities; i++)
-    {
-        printf("%i", best->greedy_route[i]);
-    }
-    printf("\n");
     simulated_annealing_search(best, distances);
-    printf("%i\n", best->greedy_distance);
-    /*if(best->greedy_distance<best->distance) best->distance = best->greedy_distance;
-    for(i=0; i<best->number_of_processes-1; i++)
-    {
-        MPI_Isend(&best->greedy_distance, 1, MPI_INT, i, TAG_BOUND, MPI_COMM_WORLD, &request);
-    }*/
-    //printf("%i\n", best->greedy_distance);
-    
 }
 
 void destroy_distance_matrice(matrix* distances, int p_id)
