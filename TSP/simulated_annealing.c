@@ -15,10 +15,9 @@
 
 void simulated_annealing_search(best_solution* best, matrix * weights)
 {
-    int i, rand_index1, rand_index2, swap_distance, dst, attempt=0;
+    int rand_index1, rand_index2, swap_distance, dst, attempt=0;
     double temp = weights->smallest_distance/40.0;
     dst = best->greedy_distance;
-    MPI_Request request;
     
     while(attempt < SATISFIED)
     {
@@ -32,10 +31,6 @@ void simulated_annealing_search(best_solution* best, matrix * weights)
             if(dst < best->distance)
             {
                 best->distance = dst;
-                for(i=0; i<best->number_of_processes-1; i++)
-                {
-                    MPI_Isend(&best->distance, 1, MPI_INT, i, TAG_BOUND, MPI_COMM_WORLD, &request);
-                }
             }
             attempt = 0;
         } else

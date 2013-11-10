@@ -93,10 +93,16 @@ void perform_branch_and_bound(matrix* distances, best_solution* best, int p_id)
 
 void perform_greedy(matrix* distances, best_solution* best, int p_id)
 {
+    int i;
+    MPI_Request request;
     //Use greedy algorithm as a base for the simulated annealing algorithm
     //best->greedy_route is the best route found by greedy algorithm
     search_greedy_solution(distances, best, p_id);
     simulated_annealing_search(best, distances);
+    for(i=0; i<best->number_of_processes-1; i++)
+    {
+        MPI_Isend(&best->distance, 1, MPI_INT, i, TAG_BOUND, MPI_COMM_WORLD, &request);
+    }
 }
 
 void destroy_distance_matrice(matrix* distances, int p_id)
