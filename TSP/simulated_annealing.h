@@ -11,6 +11,8 @@
 #include "solution.h"
 
 void simulated_annealing_search(best_solution* best, matrix* weights);
-
+int get_swap_distance(int dst, int i, int j, int* path, matrix* weights);
+int accept(int new_distance, int old_distance, double temp);
+void do_swap(int i, int j, int* path);
 
 #endif

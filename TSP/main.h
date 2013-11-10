@@ -13,6 +13,7 @@
 #include "branch_and_bound.h"
 #include "greedy.h"
 #include "solution.h"
+#include "simulated_annealing.h"
 #define TAG_BOUND 0
 #define TAG_DISTANCE 1
 #define TAG_ROUTE 2
