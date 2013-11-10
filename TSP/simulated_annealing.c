@@ -28,9 +28,9 @@ void simulated_annealing_search(best_solution* best, matrix * weights)
         {
             do_swap(rand_index1, rand_index2, best->greedy_route);
             dst = swap_distance;
-            if(dst < best->distance)
+            if(dst < best->greedy_distance)
             {
-                best->distance = dst;
+                best->greedy_distance = dst;
             }
             attempt = 0;
         } else
