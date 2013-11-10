@@ -99,6 +99,10 @@ void perform_greedy(matrix* distances, best_solution* best, int p_id)
     //best->greedy_route is the best route found by greedy algorithm
     search_greedy_solution(distances, best, p_id);
     if(best->greedy_distance<best->distance) best->distance = best->greedy_distance;
+    for(i=0; i<best->number_of_processes-1; i++)
+    {
+        MPI_Isend(&best->greedy_distance, 1, MPI_INT, i, TAG_BOUND, MPI_COMM_WORLD, &request);
+    }
     simulated_annealing_search(best, distances);
     for(i=0; i<best->number_of_processes-1; i++)
     {
