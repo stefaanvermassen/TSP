@@ -79,7 +79,7 @@ zoek(stad, gewicht, bezochte steden)\;
    }{
 markeer stad als bezocht\;
 benedengrens = bepaal\_benedengrens()\;
-\Als{boven\_splitsniveau || benedengrens < gewicht\_beste\_rondreis}{
+\Als{boven\_splitsniveau || benedengrens < beste\_rondreis}{
 \For{i=2; i<=n; i++}{
 \Als{si nog niet bezocht is}{\Als{niet\_op\_splitsniveau || p\_id = b\_nr \% aantal\_processen}{zoek(si,gewicht+d(stad,si), bezochte\_steden+1)}\Als{op\_splitsniveau}{b\_nr++}}
 }
@@ -90,7 +90,8 @@ markeer stad als onbezocht \;
 \end{algorithm}
 \noindent
 \\
-Om het algoritme zo effici\"ent mogelijk te maken, moeten we de recursieve oproep zoveel mogelijk kunnen vermijden. Nog beter is de for-lus te vermijden door er voor te zorgen dat \verb!gewicht_beste_rondreis! zo klein mogelijk is en \verb!benedengrens! zo groot mogelijk. 
+Om het algoritme zo effici\"ent mogelijk te maken, moeten we de recursieve oproep zoveel mogelijk kunnen vermijden. Nog beter is de for-lus te vermijden door er voor te zorgen dat \verb!beste_rondreis! zo klein mogelijk is en \verb!benedengrens! zo groot mogelijk. 
+\verb!beste_rondreis! is het gewicht van de beste rondreis bepaald door alle processen. Deze waarde wordt telkens ge\"updated wanneer het een betere waarde ontvangt.
 De benedengrens werd als volgt bepaald:
 \begin{itemize}
 \item Voor elke stad $s$ definieer \verb!min_door[s]! als de som van de twee goedkoopste bogen die van $s$ vertrekken.
