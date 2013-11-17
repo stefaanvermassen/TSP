@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
         }
         
         init_solution(&best, &distances, p_total-1, 1);
-        //Use the last process for greedy heuristic
+        //Use the last process for heuristics
         if(p_id != p_total-1)
         {
             perform_branch_and_bound(&distances, &best, p_id);
@@ -95,8 +95,6 @@ void perform_greedy(matrix* distances, best_solution* best, int p_id)
 {
     int i;
     MPI_Request request;
-    //Use greedy algorithm as a base for the simulated annealing algorithm
-    //best->greedy_route is the best route found by greedy algorithm
     search_greedy_solution(distances, best, p_id);
     if(best->greedy_distance<best->distance) best->distance = best->greedy_distance;
     for(i=0; i<best->number_of_processes-1; i++)
@@ -110,6 +108,11 @@ void perform_greedy(matrix* distances, best_solution* best, int p_id)
     }
     if(best->greedy_distance<best->distance) best->distance = best->greedy_distance;
     tabu_search(best, distances);
+    for(i=0; i<best->number_of_processes-1; i++)
+    {
+        MPI_Isend(&best->greedy_distance, 1, MPI_INT, i, TAG_BOUND, MPI_COMM_WORLD, &request);
+    }
+    if(best->greedy_distance<best->distance) best->distance = best->greedy_distance;
 }
 
 void destroy_distance_matrice(matrix* distances, int p_id)
