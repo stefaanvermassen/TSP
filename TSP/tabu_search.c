@@ -29,13 +29,16 @@ void tabu_search(best_solution* best, matrix* weights)
     for (i=0; i<NUMBER_OF_ITERATIONS; i++)
     {
         get_better_path(best, weights, &tabu);
+        for(j=0; j<weights->number_of_cities; j++)
+        {
+            tabu.init_solution[j]=tabu.temp_solution[j];
+        }
         if(tabu.temp_distance < best->greedy_distance)
         {
             best->greedy_distance = tabu.temp_distance;
             for(j=0; j<weights->number_of_cities; j++)
             {
                 best->greedy_route[j] = tabu.temp_solution[j];
-                tabu.init_solution[j]=tabu.temp_solution[j];
             }
         }
         
@@ -50,7 +53,7 @@ void decrement_tabu(tabu_sol* tabu, matrix* weights)
     {
         for(j=0; j<weights->number_of_cities; j++)
         {
-            if(tabu->tabu_list[i][j] >=0) tabu->tabu_list[i][j]-=1;
+            if(tabu->tabu_list[i][j] >0) tabu->tabu_list[i][j]-=1;
         }
     }
 }
@@ -86,7 +89,6 @@ void get_better_path(best_solution* best, matrix* weights, tabu_sol* tabu)
                         tabu->temp_solution[k] = tabu->init_solution[k];
                     }
                 }
-                swap(tabu->init_solution,i,j);
             }
         }
     }
