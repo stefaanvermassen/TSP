@@ -29,6 +29,10 @@ void tabu_search(best_solution* best, matrix* weights)
     for (i=0; i<NUMBER_OF_ITERATIONS; i++)
     {
         get_better_path(best, weights, &tabu);
+	for(j=0; j<weights->number_of_cities; j++)
+        {
+            tabu.init_solution[j]=tabu.temp_solution[j];
+        }
         if(tabu.temp_distance < best->greedy_distance)
         {
             best->greedy_distance = tabu.temp_distance;
@@ -50,14 +54,14 @@ void decrement_tabu(tabu_sol* tabu, matrix* weights)
     {
         for(j=0; j<weights->number_of_cities; j++)
         {
-            if(tabu->tabu_list[i][j] >=0) tabu->tabu_list[i][j]-=1;
+            if(tabu->tabu_list[i][j] >0) tabu->tabu_list[i][j]-=1;
         }
     }
 }
 
 void get_better_path(best_solution* best, matrix* weights, tabu_sol* tabu)
 {
-    int i,j,k,city1=0;
+    int i,j,k,z,city1=0;
     int city2=0;
     int first_neighbor=1;
     int swap_distance = 0;
@@ -75,8 +79,14 @@ void get_better_path(best_solution* best, matrix* weights, tabu_sol* tabu)
             {
                 swap(tabu->init_solution,i,j);
                 swap_distance = get_route_distance(tabu->init_solution, weights);
+		//for(z=0; z<weights->number_of_cities; z++){
+		//	printf("%i",tabu->init_solution[z]);
+		//}
+		//printf("\n");
+		//printf("i:%i,j:%i,tabulist:%i, swap_distance: %i\n", i,j,tabu->tabu_list[i][j], swap_distance);
                 if((swap_distance > tabu->temp_distance || first_neighbor) && tabu->tabu_list[i][j]==0)
                 {
+                   // printf("IN\n");
                     first_neighbor = 0;
                     city1=i;
                     city2=j;
@@ -86,7 +96,6 @@ void get_better_path(best_solution* best, matrix* weights, tabu_sol* tabu)
                         tabu->temp_solution[k] = tabu->init_solution[k];
                     }
                 }
-                swap(tabu->init_solution,i,j);
             }
         }
     }
