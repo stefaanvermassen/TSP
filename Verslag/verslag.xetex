@@ -185,7 +185,7 @@ Op het einde zal elk proces dat ingezet was voor \textit{branch and bound} zijn 
 \begin{figure}[H]
   \begin{center}
     \input{testresults/aantal_processen2.tex}
-    \caption{Invloed van het aantal processen zoeken naar een kortste rondreis tussen 23 steden}
+    \caption{Invloed van het aantal processen zoeken naar een kortste rondreis tussen 26 steden}
     \label{graph:graph1}
   \end{center}
 \end{figure}

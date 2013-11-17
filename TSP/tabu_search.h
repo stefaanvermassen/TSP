@@ -14,6 +14,8 @@
 typedef struct{
     int** tabu_list;
     int tabu_length;
+    int* init_solution;
+    int init_distance;
     int* temp_solution;
     int temp_distance;
 } tabu_sol;
