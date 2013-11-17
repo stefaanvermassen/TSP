@@ -60,7 +60,7 @@ void decrement_tabu(tabu_sol* tabu, matrix* weights)
 
 void get_better_path(best_solution* best, matrix* weights, tabu_sol* tabu)
 {
-    int i,j,k,city1=0;
+    int i,j,k,z,city1=0;
     int city2=0;
     int first_neighbor=1;
     int swap_distance = 0;
@@ -78,8 +78,14 @@ void get_better_path(best_solution* best, matrix* weights, tabu_sol* tabu)
             {
                 swap(tabu->init_solution,i,j);
                 swap_distance = get_route_distance(tabu->init_solution, weights);
+		//for(z=0; z<weights->number_of_cities; z++){
+		//	printf("%i",tabu->init_solution[z]);
+		//}
+		//printf("\n");
+		//printf("i:%i,j:%i,tabulist:%i, swap_distance: %i\n", i,j,tabu->tabu_list[i][j], swap_distance);
                 if((swap_distance > tabu->temp_distance || first_neighbor) && tabu->tabu_list[i][j]==0)
                 {
+                   // printf("IN\n");
                     first_neighbor = 0;
                     city1=i;
                     city2=j;
