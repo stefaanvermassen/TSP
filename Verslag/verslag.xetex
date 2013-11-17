@@ -12,6 +12,7 @@
 \usepackage{listings}
 \usepackage{pdfpages}
 \usepackage{titlesec}
+\usepackage{float}
 \usepackage{url}
 \usepackage{mathtools}
 \DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
@@ -174,6 +175,20 @@ Op het einde zal elk proces dat ingezet was voor \textit{branch and bound} zijn 
 \section{Correctheidstesten}
 \section{Performantietesten}
 \subsection{Invloed van het aantal processen}
+\begin{figure}[H]
+  \begin{center}
+    \input{testresults/aantal_processen.tex}
+    \caption{Invloed van het aantal processen zoeken naar een kortste rondreis tussen 23 steden}
+    \label{graph:graph1}
+  \end{center}
+\end{figure}
+\begin{figure}[H]
+  \begin{center}
+    \input{testresults/aantal_processen2.tex}
+    \caption{Invloed van het aantal processen zoeken naar een kortste rondreis tussen 23 steden}
+    \label{graph:graph1}
+  \end{center}
+\end{figure}
 \subsection{Invloed van de splitsdiepte}
 \subsection{Heuristieken}
 \subsubsection{Oplossing heuristieken}

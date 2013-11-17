@@ -77,6 +77,6 @@ void do_swap(int i, int j, int* path)
         path[j] = temp;
         i++;
         j--;
-    }
+    }    
 }
 

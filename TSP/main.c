@@ -109,6 +109,7 @@ void perform_greedy(matrix* distances, best_solution* best, int p_id)
         MPI_Isend(&best->greedy_distance, 1, MPI_INT, i, TAG_BOUND, MPI_COMM_WORLD, &request);
     }
     if(best->greedy_distance<best->distance) best->distance = best->greedy_distance;
+    tabu_search(best, distances);
 }
 
 void destroy_distance_matrice(matrix* distances, int p_id)
