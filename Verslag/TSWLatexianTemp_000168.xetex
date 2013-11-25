@@ -1,7 +1,6 @@
 \documentclass[12pt]{article}
 \usepackage[hidelinks]{hyperref}
 \usepackage[dutch]{babel}
-\usepackage{fullpage}
 \usepackage[font={footnotesize, it}]{caption}
 \usepackage[numbers]{natbib}
 \usepackage[xetex]{graphicx}
@@ -58,10 +57,12 @@
 	xleftmargin=3em
 }
 \begin{document}
-\title{\vspace{-1.0in}Project Algoritmen en Datastructuren III}
+\title{Project Algoritmen en Datastructuren III}
 \author{Stefaan Vermassen}
 \date{Oktober-December 2013}
 \maketitle
+\tableofcontents
+\newpage
 \section{Inleiding}
 Voor dit project was het de bedoeling het handelsreizigersprobleem op te lossen m.b.v. een gedistribueerde versie van de \textit{branch and bound techniek}. De heuristieken die ik gekozen heb, die worden ingezet voor het bounding gedeelte, zijn \textit{simulated annealing}, met als basis een greedy algoritme, en \textit{Tabu search}.
 \section{Implementatie}

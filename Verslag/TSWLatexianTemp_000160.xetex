@@ -1,7 +1,6 @@
 \documentclass[12pt]{article}
 \usepackage[hidelinks]{hyperref}
 \usepackage[dutch]{babel}
-\usepackage{fullpage}
 \usepackage[font={footnotesize, it}]{caption}
 \usepackage[numbers]{natbib}
 \usepackage[xetex]{graphicx}
@@ -58,10 +57,12 @@
 	xleftmargin=3em
 }
 \begin{document}
-\title{\vspace{-1.0in}Project Algoritmen en Datastructuren III}
+\title{Project Algoritmen en Datastructuren III}
 \author{Stefaan Vermassen}
 \date{Oktober-December 2013}
 \maketitle
+\tableofcontents
+\newpage
 \section{Inleiding}
 Voor dit project was het de bedoeling het handelsreizigersprobleem op te lossen m.b.v. een gedistribueerde versie van de \textit{branch and bound techniek}. De heuristieken die ik gekozen heb, die worden ingezet voor het bounding gedeelte, zijn \textit{simulated annealing}, met als basis een greedy algoritme, en \textit{Tabu search}.
 \section{Implementatie}
@@ -151,7 +152,7 @@ verlaag de temperatuur\;
  \caption{Simulated annealing}
 \end{algorithm}
 \subsection{Tabu search}
-Tabu Search heeft als voordeel tegenover basis local search algoritmes dat het zal proberen ontsnappen uit lokale minima. Hiervoor wordt gebruik gemaakt van een taboe lijst. Dit is een lijst met verwisseloperaties. Wanneer een betere oplossing gevonden wordt, zal deze verwisseloperatie taboe gemaakt worden voor een bepaald aantal iteraties, zodat we dezelfde verwisseloperatie niet onmiddellijk opnieuw kunnen toepassen.
+Tabu Search heeft als voordeel tegenover basis local search algoritmes dat het zal proberen om niet vast te zitten in locale minima. Hiervoor wordt gebruik gemaakt van een tabu lijst. Dit is een lijst met verwisseloperaties. Wanneer een betere oplossing gevonden wordt, zal deze verwisseloperatie taboe gemaakt worden voor een bepaald aantal iteraties, zodat we dezelfde verwisseloperatie niet onmiddellijk opnieuw kunnen toepassen.
 \\
 \begin{algorithm}[H]
 \SetAlgoLined 
